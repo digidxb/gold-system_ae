@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GMS — Gold Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --g1:#96680A;--g2:#C9943A;--g3:#E8B84B;--g4:#F5D87A;
+  --gd:rgba(201,148,58,0.12);--gb:rgba(232,184,75,0.2);
+  --bk:#04040A;--d1:#08080F;--d2:#0C0C16;--d3:#10101C;--d4:#161624;
+  --bd:rgba(201,148,58,0.2);--bd2:rgba(255,255,255,0.07);--bd3:rgba(255,255,255,0.03);
+  --tx:#E4DCC8;--tx2:#A89E88;--tx3:#60584A;
+  --gn:#38B06A;--gnd:rgba(56,176,106,0.1);--gnb:rgba(56,176,106,0.3);
+  --rd:#D84848;--rdd:rgba(216,72,72,0.1);--rdb:rgba(216,72,72,0.3);
+  --or:#C87838;--bl:#3878C8;
+}
+html,body{height:100%;background:var(--bk);color:var(--tx);font-family:'Inter',sans-serif;font-size:13px;overflow:hidden;}
+input,select,textarea,button{font-family:'Inter',sans-serif;}
+::-webkit-scrollbar{width:2px;height:2px;}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+
+/* LOGIN */
+#LG{position:fixed;inset:0;background:var(--bk);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+#LG::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,rgba(201,148,58,0.06) 0%,transparent 70%);}
+.lg-box{position:relative;z-index:2;text-align:center;width:100%;max-width:340px;padding:0 24px;}
+.lg-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--g1),var(--g4));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 18px;box-shadow:0 0 40px rgba(201,148,58,0.25);}
+.lg-t{font-family:'Cinzel',serif;font-size:28px;font-weight:900;color:#fff;letter-spacing:3px;margin-bottom:3px;}
+.lg-s{font-size:10px;color:var(--tx3);letter-spacing:4px;text-transform:uppercase;margin-bottom:30px;}
+.lg-in{width:100%;background:var(--d2);border:1px solid var(--bd);color:#fff;font-size:16px;padding:14px;border-radius:8px;outline:none;letter-spacing:5px;text-align:center;display:block;margin-bottom:10px;transition:border-color 0.2s;}
+.lg-in:focus{border-color:var(--g3);}
+.lg-in::placeholder{letter-spacing:2px;font-size:11px;color:var(--tx3);}
+.lg-btn{width:100%;background:linear-gradient(135deg,var(--g1),var(--g3));color:#000;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:14px;border:none;border-radius:8px;cursor:pointer;box-shadow:0 4px 20px rgba(201,148,58,0.3);}
+.lg-e{color:var(--rd);font-size:11px;margin-top:8px;height:14px;}
+.lg-h{font-size:10px;color:var(--tx3);margin-top:18px;}
+
+/* APP */
+#APP{display:none;height:100vh;flex-direction:column;}
+#APP.on{display:flex;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 14px;height:52px;background:var(--d1);border-bottom:1px solid var(--bd);flex-shrink:0;z-index:50;position:relative;}
+.tb-l{display:flex;align-items:center;gap:10px;}
+.tb-ico{width:30px;height:30px;background:linear-gradient(135deg,var(--g1),var(--g3));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.tb-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--g3);}
+.tb-c{display:flex;align-items:center;gap:8px;}
+.pricebox{background:var(--d3);border:1px solid var(--bd);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:6px;}
+.pb-lbl{font-size:9px;color:var(--tx3);}
+.pb-val{font-size:13px;font-weight:700;color:var(--g3);}
+.pb-chg{font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px;}
+.pb-chg.up{background:var(--gnd);color:var(--gn);}
+.pb-chg.dn{background:var(--rdd);color:var(--rd);}
+.pb-chg.fl{background:var(--gd);color:var(--g3);}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--gn);animation:pu 2s infinite;flex-shrink:0;}
+@keyframes pu{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.tb-r{display:flex;align-items:center;gap:8px;}
+.tb-time{font-size:10px;color:var(--tx3);display:none;}
+.lockbtn{width:30px;height:30px;background:var(--d3);border:1px solid var(--bd2);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all 0.2s;}
+.lockbtn:hover{border-color:var(--rd);color:var(--rd);}
+@media(min-width:600px){.tb-time{display:block;}}
+
+/* DESKTOP TABS */
+.dtabs{display:none;background:var(--d1);border-bottom:1px solid var(--bd);flex-shrink:0;overflow-x:auto;}
+.dtabs::-webkit-scrollbar{height:0;}
+.dtab{padding:11px 16px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none;}
+.dtab:hover{color:var(--tx);}
+.dtab.on{color:var(--g3);border-bottom-color:var(--g2);}
+@media(min-width:768px){.dtabs{display:flex;}}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;background:var(--bk);}
+.content::-webkit-scrollbar{width:3px;}
+.pane{display:none;padding:14px;}
+.pane.on{display:block;}
+@media(min-width:768px){.pane{padding:18px 22px;}}
+
+/* BOTTOM NAV */
+.bnav{display:flex;background:var(--d1);border-top:1px solid var(--bd);flex-shrink:0;}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px 2px;gap:3px;cursor:pointer;border:none;background:none;color:var(--tx3);border-top:2px solid transparent;transition:all 0.2s;}
+.bn.on{color:var(--g3);border-top-color:var(--g2);}
+.bn-ic{font-size:17px;line-height:1;}
+.bn-lb{font-size:8px;font-weight:600;letter-spacing:0.3px;}
+@media(min-width:768px){.bnav{display:none;}}
+
+/* ── SHARED COMPONENTS ── */
+.H1{font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:2px;}
+.H2{font-family:'Cinzel',serif;font-size:15px;font-weight:600;color:var(--g3);margin-bottom:4px;}
+.SUB{font-size:9px;color:var(--tx3);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:14px;}
+.GL{height:1px;background:linear-gradient(90deg,var(--g2),transparent);margin-bottom:16px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media(min-width:600px){.g4{grid-template-columns:repeat(4,1fr);}}
+.mb8{margin-bottom:8px;}.mb12{margin-bottom:12px;}.mb16{margin-bottom:16px;}.mb20{margin-bottom:20px;}
+.mt8{margin-top:8px;}.mt12{margin-top:12px;}.mt16{margin-top:16px;}
+.fx{display:flex;}.fxc{align-items:center;}.fxb{justify-content:space-between;}.fxw{flex-wrap:wrap;}.gap8{gap:8px;}.gap6{gap:6px;}
+
+/* CARDS */
+.card{background:var(--d2);border:1px solid var(--bd2);border-radius:10px;padding:14px;}
+.card-g{background:var(--d2);border:1px solid var(--bd);border-radius:10px;padding:14px;}
+.card-gn{background:var(--gnd);border:1px solid var(--gnb);border-radius:10px;padding:14px;}
+.card-rd{background:var(--rdd);border:1px solid var(--rdb);border-radius:10px;padding:14px;}
+.card-or{background:rgba(200,120,56,0.08);border:1px solid rgba(200,120,56,0.28);border-radius:10px;padding:14px;}
+.card-bl{background:rgba(56,120,200,0.08);border:1px solid rgba(56,120,200,0.28);border-radius:10px;padding:14px;}
+
+/* STAT CARDS */
+.stat{background:var(--d2);border:1px solid var(--bd2);border-radius:10px;padding:14px;position:relative;overflow:hidden;}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g1),transparent);}
+.stat.gn::before{background:var(--gn);}
+.stat.rd::before{background:var(--rd);}
+.sl{font-size:9px;color:var(--tx3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;}
+.sv{font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#fff;line-height:1.1;}
+.sv.g{color:var(--g3);}
+.sv.gn{color:var(--gn);}
+.sv.rd{color:var(--rd);}
+.sv.or{color:var(--or);}
+.sn{font-size:10px;color:var(--tx3);margin-top:3px;}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:0.5px;}
+.tbuy{background:var(--gnd);color:var(--gn);border:1px solid var(--gnb);}
+.tsell{background:var(--gd);color:var(--g3);border:1px solid var(--bd);}
+.thold{background:rgba(56,120,200,0.1);color:var(--bl);border:1px solid rgba(56,120,200,0.3);}
+.twait{background:rgba(96,88,74,0.15);color:var(--tx3);border:1px solid rgba(96,88,74,0.3);}
+.texit{background:var(--rdd);color:var(--rd);border:1px solid var(--rdb);}
+
+/* BUTTONS */
+.btn{padding:9px 14px;border-radius:7px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:none;}
+.bg{background:linear-gradient(135deg,var(--g1),var(--g3));color:#000;}
+.bg:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,148,58,0.3);}
+.bo{background:transparent;color:var(--g2);border:1px solid var(--bd);}
+.bo:hover{background:var(--gd);}
+.bgn{background:var(--gnd);color:var(--gn);border:1px solid var(--gnb);}
+.brd{background:var(--rdd);color:var(--rd);border:1px solid var(--rdb);}
+.bsm{padding:6px 10px;font-size:9px;}
+
+/* INPUTS */
+.inp{background:var(--d3);border:1px solid var(--bd2);color:var(--tx);font-size:12px;padding:9px 11px;border-radius:7px;width:100%;outline:none;transition:all 0.2s;}
+.inp:focus{border-color:var(--g2);background:var(--d4);}
+select.inp option{background:var(--d3);}
+.ilbl{font-size:9px;color:var(--tx3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;display:block;}
+.fg{margin-bottom:10px;}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.fr3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.fr4{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
+@media(min-width:480px){.fr4{grid-template-columns:repeat(4,1fr);}}
+
+/* TABLE */
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--bd2);}
+.tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.tbl th{padding:9px 11px;text-align:left;font-size:8px;letter-spacing:1.5px;color:var(--g2);border-bottom:1px solid var(--bd);background:var(--d3);white-space:nowrap;font-weight:600;text-transform:uppercase;}
+.tbl td{padding:9px 11px;border-bottom:1px solid var(--bd3);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(201,148,58,0.02);}
+
+/* ALERT */
+.al{padding:11px 13px;border-radius:8px;font-size:11px;margin-bottom:10px;line-height:1.6;}
+.al-gn{background:var(--gnd);border:1px solid var(--gnb);color:var(--gn);}
+.al-rd{background:var(--rdd);border:1px solid var(--rdb);color:var(--rd);}
+.al-g{background:var(--gd);border:1px solid var(--bd);color:var(--g3);}
+.al-bl{background:rgba(56,120,200,0.08);border:1px solid rgba(56,120,200,0.28);color:var(--bl);}
+
+/* PROGRESS */
+.prog{background:var(--d3);border-radius:20px;height:4px;overflow:hidden;margin-top:5px;}
+.pf{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--g1),var(--g3));transition:width 0.7s;}
+.pf.gn{background:linear-gradient(90deg,#155530,var(--gn));}
+.pf.rd{background:linear-gradient(90deg,#551515,var(--rd));}
+
+/* DIVIDER */
+.div{height:1px;background:var(--bd2);margin:14px 0;}
+
+/* SESSION BAR */
+.sessbar{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px;}
+.sess{border-radius:9px;padding:10px 8px;text-align:center;border:1px solid var(--bd2);background:var(--d2);transition:all 0.3s;position:relative;overflow:hidden;}
+.sess::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background 0.3s;}
+.sess.live{border-color:var(--g2);background:var(--gd);}
+.sess.live::before{background:linear-gradient(90deg,var(--g1),var(--g3));}
+.sess.hot{border-color:var(--gn);background:var(--gnd);}
+.sess.hot::before{background:var(--gn);}
+.sess-t{font-size:8px;color:var(--tx3);margin-bottom:2px;}
+.sess-n{font-size:11px;font-weight:600;}
+.sess-p{font-size:10px;color:var(--g3);font-weight:700;margin-top:3px;}
+.sess-v{font-size:9px;margin-top:2px;}
+
+/* SIGNAL HERO */
+.sighero{border-radius:12px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden;}
+.sighero.buy{background:var(--gnd);border:1px solid var(--gnb);}
+.sighero.sell{background:var(--gd);border:1px solid var(--bd);}
+.sighero.hold{background:rgba(56,120,200,0.07);border:1px solid rgba(56,120,200,0.28);}
+.sighero.exit{background:var(--rdd);border:1px solid var(--rdb);}
+.sighero.watch{background:var(--d2);border:1px solid var(--bd2);}
+.sig-a{font-family:'Cinzel',serif;font-size:24px;font-weight:700;margin-bottom:5px;}
+.sig-r{font-size:12px;line-height:1.7;}
+.sig-p{font-size:12px;font-weight:600;margin-top:9px;padding:7px 11px;border-radius:7px;background:rgba(0,0,0,0.3);display:inline-block;}
+.sig-t{font-size:10px;color:var(--tx3);margin-top:7px;}
+
+/* PRICE FEED */
+.pfeed{background:var(--d2);border:1px solid var(--bd2);border-radius:10px;overflow:hidden;}
+.pf-head{display:grid;grid-template-columns:80px 70px 80px 1fr 80px;gap:8px;padding:9px 13px;background:var(--d3);font-size:8px;letter-spacing:1.5px;color:var(--g2);font-weight:600;text-transform:uppercase;border-bottom:1px solid var(--bd);}
+.pf-row{display:grid;grid-template-columns:80px 70px 80px 1fr 80px;gap:8px;padding:10px 13px;border-top:1px solid var(--bd3);align-items:start;transition:background 0.15s;}
+.pf-row:hover{background:rgba(201,148,58,0.02);}
+.pf-row.new-row{animation:rowIn 0.4s ease;}
+@keyframes rowIn{from{background:rgba(201,148,58,0.08);}to{background:transparent;}}
+.pf-time{font-size:10px;color:var(--tx3);}
+.pf-sess{}
+.pf-price{font-size:13px;font-weight:700;color:var(--g3);}
+.pf-chg{font-size:11px;font-weight:600;}
+.pf-chg.up{color:var(--gn);}
+.pf-chg.dn{color:var(--rd);}
+.pf-chg.fl{color:var(--tx3);}
+.pf-why{font-size:10px;color:var(--tx);line-height:1.5;}
+.pf-why b{color:#fff;}
+.pf-sig{}
+/* Mobile feed row — stacked */
+@media(max-width:600px){
+  .pf-head{display:none;}
+  .pf-row{grid-template-columns:1fr;gap:5px;padding:12px 13px;}
+  .pf-price{font-size:15px;}
+  .pf-row-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .pf-row-mid{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+}
+
+/* CALENDAR */
+.calwrap{background:var(--d2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.calhdr{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid var(--bd);}
+.caltit{font-family:'Cinzel',serif;font-size:14px;color:var(--g3);font-weight:600;}
+.calnav{display:flex;gap:6px;}
+.calvbtn{width:28px;height:28px;background:var(--d3);border:1px solid var(--bd2);border-radius:6px;color:var(--tx);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.2s;}
+.calvbtn:hover{border-color:var(--bd);}
+.caldow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--d3);}
+.caldow-d{text-align:center;padding:7px 2px;font-size:8px;color:var(--tx3);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--bd3);padding:1px;}
+.calcel{background:var(--d2);min-height:55px;padding:5px 5px 4px;cursor:pointer;transition:background 0.15s;position:relative;}
+.calcel:hover{background:var(--d3);}
+.calcel.today{background:var(--gd);}
+.calcel.has{border-top:2px solid var(--g2);}
+.calcel.has.pft{border-top-color:var(--gn);}
+.calcel.has.lss{border-top-color:var(--rd);}
+.calcel.other{opacity:0.3;pointer-events:none;}
+.calcel.wknd{background:rgba(0,0,0,0.15);}
+.cal-n{font-size:10px;color:var(--tx2);margin-bottom:2px;font-weight:500;}
+.calcel.today .cal-n{color:var(--g3);font-weight:700;}
+.cal-p{font-size:9px;color:var(--g3);font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.cal-a{font-size:8px;margin-top:2px;}
+.cal-pf{font-size:9px;font-weight:700;margin-top:1px;}
+
+/* DATE HISTORY TABLE */
+.dhist{background:var(--d2);border:1px solid var(--bd2);border-radius:10px;overflow:hidden;margin-bottom:14px;}
+.dh-row{display:grid;grid-template-columns:90px 75px 75px 75px 70px 1fr;gap:8px;padding:10px 13px;border-top:1px solid var(--bd3);align-items:center;}
+.dh-head{background:var(--d3);border-top:none;border-bottom:1px solid var(--bd);font-size:8px;letter-spacing:1.5px;color:var(--g2);font-weight:600;text-transform:uppercase;}
+@media(max-width:600px){
+  .dh-row{grid-template-columns:1fr 1fr;gap:6px;}
+  .dh-head{display:none;}
+}
+
+/* MODAL */
+.modalbg{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);}
+.modalbg.off{display:none;}
+.modal{background:var(--d2);border:1px solid var(--bd);border-radius:14px 14px 0 0;padding:18px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
+@media(min-width:600px){.modal{border-radius:14px;margin:auto;}}
+.mhdl{width:32px;height:3px;background:var(--bd);border-radius:2px;margin:0 auto 14px;}
+.mtit{font-family:'Cinzel',serif;font-size:17px;color:#fff;margin-bottom:14px;}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;padding-top:13px;border-top:1px solid var(--bd2);}
+
+/* PLAN TABS */
+.ptabwrap{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px;}
+.ptab{padding:6px 13px;font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:600;color:var(--tx3);cursor:pointer;border:1px solid var(--bd2);border-radius:20px;transition:all 0.2s;background:none;}
+.ptab:hover{color:var(--tx);}
+.ptab.on{color:var(--g3);border-color:var(--g2);background:var(--gd);}
+
+/* RULES */
+.rlist{background:var(--d2);border:1px solid var(--bd2);border-radius:10px;overflow:hidden;}
+.ri{display:flex;gap:11px;padding:11px 13px;border-bottom:1px solid var(--bd3);align-items:flex-start;}
+.ri:last-child{border-bottom:none;}
+.rn{color:var(--g2);font-weight:700;font-size:12px;flex-shrink:0;width:18px;}
+.rt{font-size:11px;line-height:1.6;}
+.rt b{color:#fff;}
+
+/* INV HERO */
+.invhero{background:linear-gradient(135deg,var(--d2),rgba(201,148,58,0.06));border:1px solid var(--bd);border-radius:12px;padding:18px;position:relative;overflow:hidden;margin-bottom:14px;}
+.invhero::after{content:'◈';position:absolute;right:-10px;top:-10px;font-size:80px;color:rgba(201,148,58,0.04);}
+.inv-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:13px;}
+@media(min-width:440px){.inv-stats{grid-template-columns:repeat(4,1fr);}}
+.inv-s{background:rgba(0,0,0,0.3);border-radius:8px;padding:11px 10px;text-align:center;}
+.is-v{font-family:'Cinzel',serif;font-size:17px;font-weight:700;}
+
+/* SESSION PILLS */
+.sp{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:8px;font-weight:700;}
+.spa{background:rgba(56,120,200,0.1);color:var(--bl);}
+.spl{background:rgba(200,120,56,0.1);color:var(--or);}
+.spo{background:var(--gnd);color:var(--gn);}
+.spn{background:var(--gd);color:var(--g3);}
+.spc{background:rgba(96,88,74,0.12);color:var(--tx3);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="LG">
+  <div class="lg-box">
+    <div class="lg-icon">◈</div>
+    <div class="lg-t">GMS</div>
+    <div class="lg-s">Gold Management · Dubai UAE</div>
+    <input class="lg-in" type="password" id="pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+    <button class="lg-btn" onclick="login()">UNLOCK</button>
+    <div class="lg-e" id="lge"></div>
+    <div class="lg-h">Default: gold2026 · Change in Settings</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="APP">
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="tb-ico">◈</div>
+      <div class="tb-name">GMS</div>
+    </div>
+    <div class="tb-c">
+      <div class="pricebox">
+        <div class="ldot"></div>
+        <div class="pb-lbl">24K AED/g</div>
+        <div class="pb-val" id="tbP">—</div>
+        <div class="pb-chg fl" id="tbC">—</div>
+      </div>
+    </div>
+    <div class="tb-r">
+      <div class="tb-time" id="tbT"></div>
+      <div class="lockbtn" onclick="logout()">🔒</div>
+    </div>
+  </div>
+
+  <div class="dtabs" id="DTABS">
+    <button class="dtab on" onclick="GT('dashboard',this)">Dashboard</button>
+    <button class="dtab" onclick="GT('livefeed',this)">Live Feed</button>
+    <button class="dtab" onclick="GT('calendar',this)">Calendar</button>
+    <button class="dtab" onclick="GT('history',this)">History</button>
+    <button class="dtab" onclick="GT('signals',this)">Signals</button>
+    <button class="dtab" onclick="GT('plan',this)">Trade Plan</button>
+    <button class="dtab" onclick="GT('investor',this)">Investor</button>
+    <button class="dtab" onclick="GT('rules',this)">Rules</button>
+    <button class="dtab" onclick="GT('settings',this)">Settings</button>
+  </div>
+
+  <div class="content" id="CNT">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="pane on" id="P-dashboard">
+      <div class="fx fxc fxb mb16">
+        <div><div class="H1">Dashboard</div><div class="SUB">Live Gold Overview</div></div>
+        <div id="dbDate" style="font-size:10px;color:var(--tx3);text-align:right;line-height:1.6;"></div>
+      </div>
+      <div class="sessbar" id="SESS">
+        <div class="sess" id="s0"><div class="sess-t">5:30AM–12PM</div><div class="sess-n">🌏 Asia</div><div class="sess-p" id="sp0">—</div><div class="sess-v" style="color:var(--tx3)">Low</div></div>
+        <div class="sess" id="s1"><div class="sess-t">12PM–5PM</div><div class="sess-n">🇬🇧 London</div><div class="sess-p" id="sp1">—</div><div class="sess-v" style="color:var(--or)">Medium</div></div>
+        <div class="sess" id="s2"><div class="sess-t">5PM–9PM 🔥</div><div class="sess-n">Overlap</div><div class="sess-p" id="sp2">—</div><div class="sess-v" style="color:var(--gn)">PEAK</div></div>
+        <div class="sess" id="s3"><div class="sess-t">9PM–2AM</div><div class="sess-n">🇺🇸 New York</div><div class="sess-p" id="sp3">—</div><div class="sess-v" style="color:var(--or)">Active</div></div>
+      </div>
+      <div id="SIGA" class="sighero watch mb12">
+        <div class="sig-a" id="sa" style="color:var(--g3)">LOADING...</div>
+        <div class="sig-r" id="sr">Fetching session data...</div>
+        <div class="sig-t" id="st"></div>
+      </div>
+      <div class="g4 mb12">
+        <div class="stat"><div class="sl">My Capital</div><div class="sv g" id="db-m">—</div><div class="sn">Personal</div></div>
+        <div class="stat"><div class="sl">Investor Capital</div><div class="sv g" id="db-i">—</div><div class="sn">Partner</div></div>
+        <div class="stat gn"><div class="sl">Total Profit</div><div class="sv gn" id="db-tp">AED 0</div><div class="sn" id="db-tc">0 trades</div></div>
+        <div class="stat"><div class="sl">Success Rate</div><div class="sv g" id="db-wr">—</div><div class="prog"><div class="pf gn" id="db-wp" style="width:0%"></div></div></div>
+      </div>
+      <div class="card-g mb12">
+        <div class="fx fxc fxb mb8"><div style="font-size:11px;font-weight:600;color:#fff;">Monthly Target</div><div style="font-size:12px;color:var(--g3);font-weight:600;">AED 20,000</div></div>
+        <div class="prog"><div class="pf" id="db-mp" style="width:0%"></div></div>
+        <div class="fx fxb mt8" style="font-size:10px;color:var(--tx3);"><span id="db-me">AED 0</span><span id="db-mpct">0%</span></div>
+      </div>
+      <div class="H2 mb8">Recent Trades</div>
+      <div class="tw">
+        <table class="tbl"><thead><tr><th>Date</th><th>Time</th><th>Action</th><th>Price</th><th>Profit</th><th>Why</th></tr></thead>
+        <tbody id="db-rt"><tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:18px;">No trades yet</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ LIVE FEED ══ -->
+    <div class="pane" id="P-livefeed">
+      <div class="H1 mb4">Live Price Feed</div>
+      <div class="SUB">Auto-saved per session · UAE Time</div>
+      <div class="GL"></div>
+
+      <div class="sessbar" id="SESS2">
+        <div class="sess" id="s20"><div class="sess-t">5:30AM–12PM</div><div class="sess-n">🌏 Asia</div><div class="sess-p" id="sp20">—</div><div class="sess-v" style="color:var(--tx3)">Low</div></div>
+        <div class="sess" id="s21"><div class="sess-t">12PM–5PM</div><div class="sess-n">🇬🇧 London</div><div class="sess-p" id="sp21">—</div><div class="sess-v" style="color:var(--or)">Medium</div></div>
+        <div class="sess" id="s22"><div class="sess-t">5PM–9PM 🔥</div><div class="sess-n">Overlap</div><div class="sess-p" id="sp22">—</div><div class="sess-v" style="color:var(--gn)">PEAK</div></div>
+        <div class="sess" id="s23"><div class="sess-t">9PM–2AM</div><div class="sess-n">🇺🇸 New York</div><div class="sess-p" id="sp23">—</div><div class="sess-v" style="color:var(--or)">Active</div></div>
+      </div>
+
+      <!-- Today summary -->
+      <div class="fr4 mb12">
+        <div class="stat"><div class="sl">9AM Price</div><div class="sv g" id="t9am">—</div><div class="sn">Morning check</div></div>
+        <div class="stat"><div class="sl">5PM Price</div><div class="sv g" id="t5pm">—</div><div class="sn">Overlap open</div></div>
+        <div class="stat"><div class="sl">Day Change</div><div class="sv" id="tdchg">—</div><div class="sn">From 9AM</div></div>
+        <div class="stat"><div class="sl">Signal</div><div class="sv" id="tdsig" style="font-size:13px;">WATCH</div><div class="sn" id="tdrd">—</div></div>
+      </div>
+
+      <!-- Add price manually -->
+      <div class="card-g mb12">
+        <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:11px;">📌 Add Price Entry</div>
+        <div class="fr3">
+          <div class="fg"><label class="ilbl">Price (AED/g)</label><input class="inp" type="number" id="mp-p" placeholder="572" step="0.01"></div>
+          <div class="fg"><label class="ilbl">Session</label>
+            <select class="inp" id="mp-s">
+              <option value="9AM Morning">9AM Morning</option>
+              <option value="London 12PM">London 12PM</option>
+              <option value="Overlap 5PM" selected>Overlap 5PM 🔥</option>
+              <option value="NY 9PM">NY 9PM</option>
+            </select>
+          </div>
+          <div class="fg"><label class="ilbl">Note (optional)</label><input class="inp" type="text" id="mp-n" placeholder="Fed news / dip / spike..."></div>
+        </div>
+        <div class="fx gap8">
+          <button class="btn bg" onclick="addPrice()">ADD PRICE</button>
+          <button class="btn bo" onclick="autoFetch()">🔄 AUTO FETCH</button>
+          <span style="font-size:10px;color:var(--tx3);align-self:center;" id="fstatus"></span>
+        </div>
+      </div>
+
+      <!-- Pattern box -->
+      <div id="PATBOX" class="mb12"></div>
+
+      <!-- Feed list -->
+      <div class="fx fxc fxb mb8">
+        <div style="font-size:12px;font-weight:600;color:#fff;">Price Timeline — Every Entry</div>
+        <button class="btn brd bsm" onclick="clearFeed()">CLEAR</button>
+      </div>
+      <div class="pfeed">
+        <div class="pf-head"><div>Time</div><div>Session</div><div>Price</div><div>Why Price Changed</div><div>Signal</div></div>
+        <div id="FEED"></div>
+      </div>
+    </div>
+
+    <!-- ══ CALENDAR ══ -->
+    <div class="pane" id="P-calendar">
+      <div class="H1 mb4">Price Calendar</div>
+      <div class="SUB">Tap any day to add/view prices</div>
+      <div class="GL"></div>
+      <div class="al al-g mb12">Green border = profit day · Red = loss · Gold = price logged. Tap any date to add morning / 5PM / close price.</div>
+      <div class="calwrap mb14">
+        <div class="calhdr">
+          <button class="calvbtn" onclick="calPrev()">‹</button>
+          <div class="caltit" id="CALTIT"></div>
+          <button class="calvbtn" onclick="calNext()">›</button>
+        </div>
+        <div class="caldow">
+          <div class="caldow-d">Sun</div><div class="caldow-d">Mon</div><div class="caldow-d">Tue</div>
+          <div class="caldow-d">Wed</div><div class="caldow-d">Thu</div><div class="caldow-d">Fri</div><div class="caldow-d">Sat</div>
+        </div>
+        <div class="calgrid" id="CALGRID"></div>
+      </div>
+      <div class="H2 mb8">Monthly Summary</div>
+      <div class="g2 mb14" id="CALSUM"></div>
+    </div>
+
+    <!-- ══ HISTORY ══ -->
+    <div class="pane" id="P-history">
+      <div class="H1 mb4">Price History</div>
+      <div class="SUB">All saved prices by date and session</div>
+      <div class="GL"></div>
+      <div class="fr2 mb12">
+        <div class="fg"><label class="ilbl">Filter Month</label>
+          <select class="inp" id="hf-m" onchange="renderHistory()">
+            <option value="">All months</option>
+          </select>
+        </div>
+        <div class="fg"><label class="ilbl">Filter Session</label>
+          <select class="inp" id="hf-s" onchange="renderHistory()">
+            <option value="">All sessions</option>
+            <option>9AM Morning</option><option>London 12PM</option><option>Overlap 5PM</option><option>NY 9PM</option>
+          </select>
+        </div>
+      </div>
+      <div id="HISTTBL"></div>
+    </div>
+
+    <!-- ══ SIGNALS ══ -->
+    <div class="pane" id="P-signals">
+      <div class="H1 mb4">Signals & Timing</div>
+      <div class="SUB">When to buy · When to sell · UAE Times</div>
+      <div class="GL"></div>
+      <div class="card-g mb12">
+        <div style="font-size:12px;font-weight:600;color:#fff;margin-bottom:11px;">Live Signal Checker</div>
+        <div class="fr3">
+          <div class="fg"><label class="ilbl">Current Price</label><input class="inp" type="number" id="sc-c" placeholder="572" oninput="liveCheck()"></div>
+          <div class="fg"><label class="ilbl">Your Buy Price</label><input class="inp" type="number" id="sc-b" placeholder="560" oninput="liveCheck()"></div>
+          <div class="fg"><label class="ilbl">Days Holding</label><input class="inp" type="number" id="sc-d" placeholder="3" oninput="liveCheck()"></div>
+        </div>
+        <div id="SCRES"></div>
+      </div>
+      <div class="H2 mb8">UAE Time — When Gold Moves</div>
+      <div class="tw mb14">
+        <table class="tbl">
+          <thead><tr><th>UAE Time</th><th>Session</th><th>Volume</th><th>What To Do</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--tx3)">5:30–9AM</td><td><span class="sp spa">Asia Pre</span></td><td style="color:var(--tx3)">Very Low</td><td style="color:var(--tx3)">Sleep</td><td style="font-size:10px;color:var(--tx3)">No major markets open</td></tr>
+            <tr style="background:rgba(201,148,58,0.02)"><td><b>9:00 AM ⭐</b></td><td><span class="sp spa">Asia</span></td><td style="color:var(--or)">Low-Med</td><td style="color:var(--g3)"><b>Check price</b></td><td style="font-size:10px">Shanghai opens · Note direction</td></tr>
+            <tr><td>12:00 PM</td><td><span class="sp spl">London</span></td><td style="color:var(--or)">Medium</td><td>Watch trend</td><td style="font-size:10px">European banks enter</td></tr>
+            <tr style="background:rgba(56,176,106,0.03)"><td><b>5:00 PM 🔥</b></td><td><span class="sp spo">Overlap</span></td><td style="color:var(--gn)"><b>HIGH</b></td><td style="color:var(--gn)"><b>BUY or SELL</b></td><td style="font-size:10px">NY opens + London still active</td></tr>
+            <tr style="background:rgba(56,176,106,0.03)"><td><b>5–9 PM 🔥🔥</b></td><td><span class="sp spo">PEAK</span></td><td style="color:var(--gn)"><b>HIGHEST</b></td><td style="color:var(--gn)"><b>BEST TIME</b></td><td style="font-size:10px">Maximum liquidity · Tightest spreads</td></tr>
+            <tr><td>9:30 PM</td><td><span class="sp spn">New York</span></td><td style="color:var(--or)">Active</td><td>US news watch</td><td style="font-size:10px">US economic data drops here</td></tr>
+            <tr><td>After 11 PM</td><td><span class="sp spn">NY Late</span></td><td style="color:var(--tx3)">Slowing</td><td style="color:var(--tx3)">Avoid</td><td style="font-size:10px">Volume dropping off</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="g2 mb12">
+        <div><div class="H2 mb8" style="color:var(--gn)">✅ BUY Signals</div>
+          <div class="rlist">
+            <div class="ri"><div class="rn" style="color:var(--gn)">1</div><div class="rt"><b>2 red days in a row</b> = dip confirmed. Buy day 3 at 5PM.</div></div>
+            <div class="ri"><div class="rn" style="color:var(--gn)">2</div><div class="rt"><b>Price drops 15–20 AED/g</b> from recent high.</div></div>
+            <div class="ri"><div class="rn" style="color:var(--gn)">3</div><div class="rt"><b>3–5 days before Fed meeting</b> — gold almost always rises.</div></div>
+            <div class="ri"><div class="rn" style="color:var(--gn)">4</div><div class="rt"><b>Mon/Tue low → Wed/Thu high</b> — common weekly pattern.</div></div>
+            <div class="ri" style="border:none"><div class="rn" style="color:var(--gn)">5</div><div class="rt"><b>Start of July (Q3)</b> — institutions rebalance into gold.</div></div>
+          </div>
+        </div>
+        <div><div class="H2 mb8">💰 SELL Signals</div>
+          <div class="rlist">
+            <div class="ri"><div class="rn">1</div><div class="rt"><b>+15 AED/g minimum</b> = AED 5,220 gross on 348g.</div></div>
+            <div class="ri"><div class="rn">2</div><div class="rt">+20/g = AED 6,960 · +30/g = AED 10,440 · +50/g = AED 17,400</div></div>
+            <div class="ri"><div class="rn">3</div><div class="rt"><b>Fed meeting day</b> — sell when news drops 9:30PM UAE.</div></div>
+            <div class="ri"><div class="rn">4</div><div class="rt"><b>Wed/Thu 6–8PM</b> — highest volume, best sell price.</div></div>
+            <div class="ri" style="border:none"><div class="rn">5</div><div class="rt"><b>Last 2 days of month</b> — institutions push price up.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-rd"><div class="H2 mb8" style="color:var(--rd)">🚨 EXIT Rule</div>
+        <div class="g2"><div><div class="sl">Trigger</div><div style="font-size:18px;font-weight:700;color:var(--rd);">−20 AED/g</div><div class="sn">From your buy price</div></div>
+        <div><div class="sl">Action</div><div style="font-size:12px;font-weight:700;color:var(--rd);margin-top:4px;">SELL → WAIT → REBUY LOWER</div><div class="sn">Small loss beats big loss always</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ TRADE PLAN ══ -->
+    <div class="pane" id="P-plan">
+      <div class="H1 mb4">6-Month Trade Plan</div>
+      <div class="SUB">Apr → Sep 2026 · Weekly Schedule</div>
+      <div class="GL"></div>
+      <div class="g3 mb14" id="PSTRIP"></div>
+      <div class="ptabwrap" id="PTABS"></div>
+      <div id="PCONT"></div>
+      <div class="div"></div>
+      <div class="H2 mb8">6 Golden Rules</div>
+      <div class="rlist">
+        <div class="ri"><div class="rn">1</div><div class="rt"><b>Check price 9AM daily.</b> uaegoldprice.com — takes 2 minutes. Never skip.</div></div>
+        <div class="ri"><div class="rn">2</div><div class="rt"><b>Buy after 2+ falling days.</b> Never buy first red day. Wait for confirmation.</div></div>
+        <div class="ri"><div class="rn">3</div><div class="rt"><b>Minimum +15 AED/g to sell.</b> 348g = AED 5,220. Aim for 20–30/g.</div></div>
+        <div class="ri"><div class="rn">4</div><div class="rt"><b>Exit at −20 AED/g.</b> No emotion. Sell fast. Rebuy lower.</div></div>
+        <div class="ri"><div class="rn">5</div><div class="rt"><b>Fed dates = biggest opportunities.</b> Apr 29 · Jul 29 · Aug mid · Sep 17.</div></div>
+        <div class="ri" style="border:none"><div class="rn">6</div><div class="rt"><b>Never all-in at once.</b> Buy 2 bars first. Add 3rd only on confirmed dip.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ INVESTOR ══ -->
+    <div class="pane" id="P-investor">
+      <div class="H1 mb4">Investor Plan</div>
+      <div class="SUB">Partnership · Returns · Pitch</div>
+      <div class="GL"></div>
+      <div class="invhero">
+        <div style="font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;">Gold Trading Partnership</div>
+        <div style="font-size:9px;color:var(--tx3);letter-spacing:2px;margin-bottom:12px;">Dubai UAE · 24K Gold · TT Bars</div>
+        <div style="font-size:11px;color:var(--tx);line-height:1.8;max-width:500px;">Active swing trading of physical 24K gold TT bars using dealer connections. Capital always protected as physical asset.</div>
+        <div class="inv-stats">
+          <div class="inv-s"><div class="sl">My Capital</div><div class="is-v" style="color:var(--g3);" id="iv-m">—</div></div>
+          <div class="inv-s"><div class="sl">Investor Capital</div><div class="is-v" style="color:var(--g3);" id="iv-i">—</div></div>
+          <div class="inv-s"><div class="sl">Split</div><div class="is-v" style="color:var(--gn)">50 / 50</div></div>
+          <div class="inv-s"><div class="sl">Annual ROI</div><div class="is-v" style="color:var(--gn)">27–43%</div></div>
+        </div>
+      </div>
+      <div class="tw mb14">
+        <table class="tbl"><thead><tr><th>Month</th><th>Gross</th><th>Investor Share</th><th>Outlook</th></tr></thead>
+        <tbody>
+          <tr><td>April 2026</td><td>AED 13K–24K</td><td style="color:var(--g3)">AED 6.5K–12K</td><td><span class="tag twait">Recovery</span></td></tr>
+          <tr><td>May 2026</td><td>AED 17K–28K</td><td style="color:var(--gn)">AED 8.5K–14K</td><td><span class="tag tbuy">Bullish</span></td></tr>
+          <tr><td>June 2026</td><td>AED 10K–15K</td><td style="color:var(--or)">AED 5K–7.5K</td><td><span class="tag thold">Slow</span></td></tr>
+          <tr><td>July 2026</td><td>AED 19K–28K</td><td style="color:var(--gn)">AED 9.5K–14K</td><td><span class="tag tbuy">Bullish</span></td></tr>
+          <tr><td>August 2026</td><td>AED 29K–45K</td><td style="color:var(--gn)">AED 14.5K–22.5K</td><td><span class="tag tbuy">Best</span></td></tr>
+          <tr><td>September 2026</td><td>AED 22K–32K</td><td style="color:var(--gn)">AED 11K–16K</td><td><span class="tag tbuy">Fed Spike</span></td></tr>
+          <tr style="background:rgba(56,176,106,0.04)"><td><b>Total</b></td><td style="color:var(--gn)"><b>AED 1.1L–1.72L</b></td><td style="color:var(--g3)"><b>AED 55K–86K</b></td><td style="color:var(--gn)"><b>27–43%</b></td></tr>
+        </tbody></table>
+      </div>
+      <div class="fx fxc fxb mb8"><div class="H2">Payment Tracker</div><button class="btn bg bsm" onclick="addPay()">+ Add</button></div>
+      <div class="tw mb14"><table class="tbl"><thead><tr><th>Month</th><th>Gross</th><th>Investor Share</th><th>Status</th><th>Action</th></tr></thead><tbody id="PAYT"><tr><td colspan="5" style="text-align:center;color:var(--tx3);padding:14px;">None yet</td></tr></tbody></table></div>
+      <div class="H2 mb8">Pitch Message</div>
+      <div class="card-g">
+        <div id="PITCH" style="font-size:11px;line-height:1.9;white-space:pre-line;color:var(--tx);"></div>
+        <div class="fx gap8 mt12">
+          <button class="btn bg bsm" onclick="copyPitch()">COPY</button>
+          <button class="btn bo bsm" onclick="swPitch()">SWITCH STYLE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ RULES ══ -->
+    <div class="pane" id="P-rules">
+      <div class="H1 mb16">Rules & Notes</div>
+      <div class="g2 mb14">
+        <div>
+          <div class="H2 mb8">Trading Rules</div>
+          <div class="rlist">
+            <div class="ri"><div class="rn">1</div><div class="rt"><b>9AM check every morning.</b> Non-negotiable daily habit.</div></div>
+            <div class="ri"><div class="rn">2</div><div class="rt"><b>2 red days = buy signal.</b> 1 red day = wait.</div></div>
+            <div class="ri"><div class="rn">3</div><div class="rt"><b>Minimum +15/g to sell.</b> AED 5,220 on 348g.</div></div>
+            <div class="ri"><div class="rn">4</div><div class="rt"><b>Exit at −20/g.</b> No emotion. Fast exit.</div></div>
+            <div class="ri"><div class="rn">5</div><div class="rt"><b>5–9PM UAE = action window.</b> Always act here.</div></div>
+            <div class="ri"><div class="rn">6</div><div class="rt"><b>Never all-in.</b> 2 bars first, add 3rd carefully.</div></div>
+            <div class="ri"><div class="rn">7</div><div class="rt"><b>Fed dates are your calendar.</b> Apr29 · Jul29 · Sep17.</div></div>
+            <div class="ri" style="border:none"><div class="rn">8</div><div class="rt"><b>Hold beats panic.</b> Physical gold always recovers.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="H2 mb8">Notes</div>
+          <textarea class="inp" id="NTS" rows="10" style="resize:vertical;" placeholder="Daily observations, market notes..."></textarea>
+          <button class="btn bg bsm mt8" onclick="saveNotes()">SAVE</button>
+          <span id="nok" style="font-size:9px;color:var(--gn);margin-left:7px;"></span>
+          <div class="div"></div>
+          <div class="H2 mb8">Contacts</div>
+          <div class="fr2">
+            <div class="fg"><label class="ilbl">Dealer Name</label><input class="inp" id="c1" placeholder="Name"></div>
+            <div class="fg"><label class="ilbl">Dealer Phone</label><input class="inp" id="c2" placeholder="+971..."></div>
+          </div>
+          <div class="fr2">
+            <div class="fg"><label class="ilbl">Investor Name</label><input class="inp" id="c3" placeholder="Name"></div>
+            <div class="fg"><label class="ilbl">Investor Phone</label><input class="inp" id="c4" placeholder="+971..."></div>
+          </div>
+          <button class="btn bg bsm" onclick="saveCont()">SAVE</button>
+          <span id="cok" style="font-size:9px;color:var(--gn);margin-left:7px;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="pane" id="P-settings">
+      <div class="H1 mb16">Settings</div>
+      <div class="g2">
+        <div>
+          <div class="card-g mb12">
+            <div class="H2 mb12">Capital & Split</div>
+            <div class="fg"><label class="ilbl">My Capital (AED)</label><input class="inp" type="number" id="s-m" value="100000"></div>
+            <div class="fg"><label class="ilbl">Investor Capital (AED)</label><input class="inp" type="number" id="s-i" value="100000"></div>
+            <div class="fg"><label class="ilbl">My Profit Split (%)</label><input class="inp" type="number" id="s-sp" value="50"></div>
+            <div class="fg"><label class="ilbl">Default Bars</label><input class="inp" type="number" id="s-b" value="3"></div>
+            <button class="btn bg" onclick="saveSet()">SAVE</button>
+            <span id="sok" style="font-size:9px;color:var(--gn);margin-left:7px;"></span>
+          </div>
+          <div class="card-g">
+            <div class="H2 mb12">Change Password</div>
+            <div class="fg"><label class="ilbl">Current</label><input class="inp" type="password" id="p1"></div>
+            <div class="fg"><label class="ilbl">New Password</label><input class="inp" type="password" id="p2"></div>
+            <div class="fg"><label class="ilbl">Confirm</label><input class="inp" type="password" id="p3"></div>
+            <button class="btn bg" onclick="changePW()">CHANGE</button>
+            <div id="pm" style="font-size:10px;margin-top:6px;height:14px;"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card-g mb12">
+            <div class="H2 mb12">Backup & Restore</div>
+            <div style="font-size:11px;color:var(--tx);line-height:1.8;margin-bottom:12px;">All data saved in browser. Export to backup on phone or GitHub.</div>
+            <div class="fx gap8 fxw mb12">
+              <button class="btn bg" onclick="exportD()">EXPORT JSON</button>
+              <button class="btn bo" onclick="document.getElementById('impF').click()">IMPORT JSON</button>
+              <input type="file" id="impF" style="display:none" accept=".json" onchange="importD(event)">
+            </div>
+            <button class="btn brd bsm" onclick="nukeAll()">CLEAR ALL DATA</button>
+          </div>
+          <div class="card-bl">
+            <div class="H2 mb8" style="color:var(--bl);">Host Free on GitHub</div>
+            <div style="font-size:11px;color:var(--tx);line-height:1.9;">
+              <b style="color:var(--bl)">1.</b> github.com → New repo → Upload this file as <b>index.html</b><br>
+              <b style="color:var(--bl)">2.</b> Settings → Pages → Deploy from main<br>
+              <b style="color:var(--bl)">3.</b> Your app: <b>username.github.io/repo</b><br>
+              <b style="color:var(--bl)">4.</b> Open on any phone forever — free!<br><br>
+              <b style="color:var(--bl)">Save data on Firebase:</b><br>
+              firebase.google.com → Firestore → Export JSON → paste as document
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <button class="bn on" onclick="GT('dashboard',this)"><div class="bn-ic">📊</div><div class="bn-lb">Home</div></button>
+    <button class="bn" onclick="GT('livefeed',this)"><div class="bn-ic">📡</div><div class="bn-lb">Feed</div></button>
+    <button class="bn" onclick="GT('calendar',this)"><div class="bn-ic">📅</div><div class="bn-lb">Cal</div></button>
+    <button class="bn" onclick="GT('history',this)"><div class="bn-ic">📋</div><div class="bn-lb">History</div></button>
+    <button class="bn" onclick="GT('plan',this)"><div class="bn-ic">🗓</div><div class="bn-lb">Plan</div></button>
+    <button class="bn" onclick="GT('investor',this)"><div class="bn-ic">🤝</div><div class="bn-lb">Invest</div></button>
+    <button class="bn" onclick="GT('settings',this)"><div class="bn-ic">⚙️</div><div class="bn-lb">Set</div></button>
+  </div>
+</div><!-- /APP -->
+
+<!-- DAY MODAL -->
+<div class="modalbg off" id="DAYMOD">
+  <div class="modal">
+    <div class="mhdl"></div>
+    <div class="mtit" id="MODTIT">Date</div>
+    <div class="fr3">
+      <div class="fg"><label class="ilbl">9AM Price</label><input class="inp" type="number" id="m-9" placeholder="572"></div>
+      <div class="fg"><label class="ilbl">5PM Price</label><input class="inp" type="number" id="m-5" placeholder="578"></div>
+      <div class="fg"><label class="ilbl">Close Price</label><input class="inp" type="number" id="m-c" placeholder="580"></div>
+    </div>
+    <div class="fr2">
+      <div class="fg"><label class="ilbl">Action</label>
+        <select class="inp" id="m-a"><option>BUY</option><option>SELL</option><option>HOLD</option><option>WATCH</option></select>
+      </div>
+      <div class="fg"><label class="ilbl">Profit/Loss (AED)</label><input class="inp" type="number" id="m-pf" placeholder="0"></div>
+    </div>
+    <div class="fg"><label class="ilbl">Notes / Reason</label><input class="inp" type="text" id="m-nt" placeholder="Why did price change today?"></div>
+    <div class="mfoot">
+      <button class="btn brd bsm" onclick="delDay()">DELETE</button>
+      <button class="btn bo bsm" onclick="closeModal()">CANCEL</button>
+      <button class="btn bg bsm" onclick="saveDay()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════════
+const S={
+  g:k=>{try{return JSON.parse(localStorage.getItem('gms3_'+k));}catch{return null;}},
+  s:(k,v)=>localStorage.setItem('gms3_'+k,JSON.stringify(v))
+};
+let cfg=S.g('cfg')||{myc:100000,invc:100000,split:50,bars:3,pw:'gold2026'};
+let feed=S.g('feed')||[];        // price feed entries
+let trades=S.g('trades')||[];   // trade log
+let calD=S.g('cal')||{};        // calendar data keyed by YYYY-MM-DD
+let pays=S.g('pays')||[];
+let pStyle=0;
+let calY=new Date().getFullYear(), calM=new Date().getMonth();
+let activeDayKey=null;
+
+// ════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════
+function login(){
+  const v=document.getElementById('pw').value;
+  if(v===cfg.pw){
+    document.getElementById('LG').style.display='none';
+    document.getElementById('APP').classList.add('on');
+    initApp();
+  } else {
+    const e=document.getElementById('lge');e.textContent='Wrong password';
+    document.getElementById('pw').value='';
+    setTimeout(()=>e.textContent='',2000);
+  }
+}
+function logout(){document.getElementById('APP').classList.remove('on');document.getElementById('LG').style.display='flex';document.getElementById('pw').value='';}
+
+// ════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════
+function GT(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.dtab,.bn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('P-'+id).classList.add('on');
+  document.querySelectorAll(`[onclick*="'${id}'"]`).forEach(b=>b.classList.add('on'));
+  document.getElementById('CNT').scrollTop=0;
+  if(id==='dashboard')renderDash();
+  if(id==='calendar')renderCal();
+  if(id==='history')renderHistory();
+  if(id==='plan')renderPlan();
+  if(id==='investor')renderInv();
+  if(id==='rules')loadRules();
+  if(id==='settings')loadSet();
+  if(id==='livefeed'){renderFeed();analysePattern();}
+}
+
+// ════════════════════════════════════════════
+// UAE CLOCK
+// ════════════════════════════════════════════
+function uae(){return new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Dubai'}));}
+function fDate(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function fTime(d){return pad(d.getHours())+':'+pad(d.getMinutes());}
+function pad(n){return String(n).padStart(2,'0');}
+function sessOf(h,m){
+  const t=h*60+m;
+  if(t>=330&&t<720) return{name:'9AM Morning',key:0,lbl:'Asia',cls:'spa'};
+  if(t>=720&&t<1020) return{name:'London 12PM',key:1,lbl:'London',cls:'spl'};
+  if(t>=1020&&t<1260) return{name:'Overlap 5PM',key:2,lbl:'Overlap 🔥',cls:'spo'};
+  if((t>=1260&&t<1440)||(t>=0&&t<120)) return{name:'NY 9PM',key:3,lbl:'New York',cls:'spn'};
+  return{name:'Closed',key:-1,lbl:'Closed',cls:'spc'};
+}
+
+function tick(){
+  const now=uae();
+  const h=now.getHours(),m=now.getMinutes(),day=now.getDay();
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const t=document.getElementById('tbT');
+  if(t) t.textContent=pad(h)+':'+pad(m)+' UAE · '+days[day]+' '+now.getDate()+' '+months[now.getMonth()];
+  const db=document.getElementById('dbDate');
+  if(db) db.innerHTML=days[day]+', '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+'<br><span style="color:var(--g3);font-weight:600;">'+pad(h)+':'+pad(m)+' UAE</span>';
+  updateSessBars(h,m);
+  updateSignalHero(h,m,day);
+  updateTodaySummary();
+  // Auto-log price at session boundaries
+  autoSessionLog(h,m,now);
+}
+
+function updateSessBars(h,m){
+  const t=h*60+m;
+  for(let i=0;i<4;i++){
+    document.getElementById('s'+i)?.classList.remove('live','hot');
+    document.getElementById('s2'+i)?.classList.remove('live','hot');
+  }
+  let si=-1;
+  if(t>=330&&t<720)si=0;
+  else if(t>=720&&t<1020)si=1;
+  else if(t>=1020&&t<1260)si=2;
+  else if((t>=1260&&t<1440)||(t<120))si=3;
+  if(si>=0){
+    const cls=si===2?'hot':'live';
+    document.getElementById('s'+si)?.classList.add(cls);
+    document.getElementById('s2'+si)?.classList.add(cls);
+  }
+}
+
+// ════════════════════════════════════════════
+// AUTO SESSION PRICE LOG
+// ════════════════════════════════════════════
+let lastAutoSess=-1;
+function autoSessionLog(h,m,now){
+  const sess=sessOf(h,m);
+  if(sess.key===lastAutoSess||sess.key<0) return;
+  // Only log if session just started (within first 5 min)
+  const t=h*60+m;
+  const starts=[330,720,1020,1260];
+  const justStarted=starts.some(s=>t>=s&&t<s+5);
+  if(!justStarted) return;
+  lastAutoSess=sess.key;
+  // Only auto-log if we have a current price
+  const lastP=feed.length>0?feed[feed.length-1].price:null;
+  if(!lastP) return;
+  // Add auto entry for new session
+  addPriceEntry(lastP, sess.name, 'Session boundary — '+sess.lbl+' session opened', true);
+}
+
+// ════════════════════════════════════════════
+// PRICE FEED
+// ════════════════════════════════════════════
+function addPrice(){
+  const price=parseFloat(document.getElementById('mp-p').value);
+  const sess=document.getElementById('mp-s').value;
+  const note=document.getElementById('mp-n').value;
+  if(!price||isNaN(price)){alert('Enter a valid price');return;}
+  addPriceEntry(price,sess,note,false);
+  document.getElementById('mp-p').value='';
+  document.getElementById('mp-n').value='';
+}
+
+function addPriceEntry(price,sess,noteOverride,isAuto){
+  const now=uae();
+  const prev=feed.length>0?feed[feed.length-1].price:null;
+  const diff=prev?Math.round((price-prev)*100)/100:0;
+  const pct=prev?Math.round((diff/prev)*10000)/100:0;
+  const h=now.getHours(),m=now.getMinutes(),day=now.getDay();
+  const reason=noteOverride||genReason(diff,pct,h,m,day,sess);
+  const signal=genSignal(price,diff,h,m,day);
+  const entry={
+    id:Date.now(),
+    date:fDate(now),
+    time:fTime(now),
+    sess,
+    price,
+    prev,
+    diff,
+    pct,
+    reason,
+    signal,
+    auto:!!isAuto
+  };
+  feed.push(entry);
+  if(feed.length>500)feed=feed.slice(-500);
+  S.s('feed',feed);
+  // Also save in calData for the calendar
+  if(!calD[entry.date])calD[entry.date]={};
+  const cd=calD[entry.date];
+  if(sess.includes('9AM')&&!cd.am)cd.am=price;
+  if(sess.includes('5PM')&&!cd.pm)cd.pm=price;
+  cd.last=price;
+  cd.lastSess=sess;
+  S.s('cal',calD);
+  // Update topbar
+  updateTopbarPrice(price,diff);
+  renderFeed();
+  updateTodaySummary();
+  analysePattern();
+}
+
+function updateTopbarPrice(price,diff){
+  const el=document.getElementById('tbP');
+  const ce=document.getElementById('tbC');
+  if(el)el.textContent=price.toFixed(2);
+  if(ce){
+    if(Math.abs(diff)<0.05){ce.textContent='→ 0.00';ce.className='pb-chg fl';}
+    else if(diff>0){ce.textContent='▲+'+diff.toFixed(2);ce.className='pb-chg up';}
+    else{ce.textContent='▼'+diff.toFixed(2);ce.className='pb-chg dn';}
+  }
+  // Update session price displays
+  const now=uae();
+  const {key}=sessOf(now.getHours(),now.getMinutes());
+  if(key>=0){
+    const el0=document.getElementById('sp'+key);
+    const el2=document.getElementById('sp2'+key);
+    if(el0)el0.textContent=price.toFixed(2);
+    if(el2)el2.textContent=price.toFixed(2);
+  }
+}
+
+async function autoFetch(){
+  document.getElementById('fstatus').textContent='Fetching...';
+  try{
+    const r=await fetch('https://data-asg.goldprice.org/dbXRates/USD');
+    const d=await r.json();
+    if(d.items&&d.items[0]){
+      const usdOz=d.items[0].xauPrice;
+      const fx=await fetch('https://api.frankfurter.app/latest?from=USD&to=AED');
+      const fxd=await fx.json();
+      const rate=fxd.rates?.AED||3.6725;
+      const aedGram=Math.round((usdOz/31.1035)*rate*100)/100;
+      document.getElementById('mp-p').value=aedGram;
+      document.getElementById('fstatus').textContent='✓ Fetched: AED '+aedGram+'/g';
+      setTimeout(()=>document.getElementById('fstatus').textContent='',4000);
+    }
+  }catch(e){
+    document.getElementById('fstatus').textContent='Auto-fetch failed — enter manually';
+  }
+}
+
+function clearFeed(){if(confirm('Clear all feed entries?')){feed=[];S.s('feed',feed);renderFeed();}}
+
+// ════════════════════════════════════════════
+// REASON GENERATOR
+// ════════════════════════════════════════════
+function genReason(diff,pct,h,m,day,sess){
+  const t=h*60+m;
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  let parts=[];
+  // Session context
+  if(sess.includes('Overlap')||sess.includes('5PM'))parts.push('London+NY overlap — highest daily volume');
+  else if(sess.includes('London'))parts.push('London session — European banks active');
+  else if(sess.includes('9AM'))parts.push('Asian session — Shanghai Gold Exchange open');
+  else if(sess.includes('NY'))parts.push('New York session — COMEX futures active');
+  // Day context
+  if(day===1)parts.push('Monday — lowest volume, limited movement');
+  else if(day===3||day===4)parts.push(days[day]+' — highest volatility day of week');
+  else if(day===5&&t>=720)parts.push('Friday PM — position closing before weekend');
+  // Price movement
+  if(Math.abs(diff)<0.5)parts.push('Price flat — market consolidating or low volume');
+  else if(diff>30)parts.push('Sharp spike +'+diff.toFixed(1)+'/g — news event, safe-haven rush or Fed dovish signal');
+  else if(diff>15)parts.push('Strong rise +'+diff.toFixed(1)+'/g — institutional buying or bullish momentum');
+  else if(diff>5)parts.push('Moderate rise +'+diff.toFixed(1)+'/g — steady buying pressure');
+  else if(diff>0)parts.push('Small rise +'+diff.toFixed(1)+'/g — normal session movement');
+  else if(diff<-20)parts.push('Sharp drop '+diff.toFixed(1)+'/g — profit taking, strong USD or hawkish news');
+  else if(diff<-10)parts.push('Significant drop '+diff.toFixed(1)+'/g — selling pressure or risk-on sentiment');
+  else if(diff<0)parts.push('Dip '+diff.toFixed(1)+'/g — minor pullback');
+  return parts.join(' · ');
+}
+
+// ════════════════════════════════════════════
+// SIGNAL GENERATOR
+// ════════════════════════════════════════════
+function genSignal(price,diff,h,m,day){
+  const t=h*60+m;
+  const inOL=t>=1020&&t<1260;
+  const recentDrops=feed.slice(-3).filter(f=>f.diff<-1).length;
+  const recentRises=feed.slice(-3).filter(f=>f.diff>5).length;
+  if(day===0||day===6)return'CLOSED';
+  if(day===5&&t>=1020)return'NO NEW BUY';
+  if(recentDrops>=2&&inOL)return'🔥 BUY NOW';
+  if(recentDrops>=2)return'BUY — wait 5PM';
+  if(diff<-20)return'EXIT ⚠️';
+  if(diff>15&&inOL)return'💰 SELL';
+  if(diff>15)return'SELL';
+  return'WATCH';
+}
+
+// ════════════════════════════════════════════
+// SIGNAL HERO
+// ════════════════════════════════════════════
+function updateSignalHero(h,m,day){
+  const t=h*60+m;
+  const inOL=t>=1020&&t<1260;
+  const recentDrops=feed.slice(-3).filter(f=>f.diff<-1).length;
+  const recentRises=feed.slice(-3).filter(f=>f.diff>5).length;
+  const el=document.getElementById('SIGA');
+  const aa=document.getElementById('sa');
+  const rr=document.getElementById('sr');
+  const tt=document.getElementById('st');
+  if(!el||!aa||!rr) return;
+  const dnames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const sess=sessOf(h,m);
+  let act,rsn,cls;
+  if(day===0||day===6){act='MARKET CLOSED';rsn='Weekend — gold market closed. Review week and plan Monday entry.';cls='watch';}
+  else if(day===1&&t<720){act='OBSERVE';rsn='Monday morning — lowest volume. Check opening price only. Do not trade yet.';cls='watch';}
+  else if(recentDrops>=2&&inOL){act='🔥 BUY NOW';rsn=recentDrops+' consecutive drops + London/NY overlap = your strongest buy signal. Call dealer immediately between 5-9PM.';cls='buy';}
+  else if(recentDrops>=2){act='BUY SIGNAL';rsn=recentDrops+' consecutive drops detected. Set alarm for 5PM UAE. Execute buy during overlap window (5-9PM) — never before.';cls='buy';}
+  else if(recentRises>=2&&inOL){act='💰 CONSIDER SELL';rsn='Consistent rising during overlap window. If holding +15/g profit — consider selling now. Call dealer.';cls='sell';}
+  else if(day===5&&t>=1020){act='CLOSE POSITIONS';rsn='Friday afternoon — sell any open positions. No new buys. Weekend gap risk.';cls='sell';}
+  else if(inOL&&(day===3||day===4)){act='⭐ PRIME WINDOW';rsn='Wed/Thu 5–9PM UAE = best combination in the week. Act on any confirmed signal right now.';cls='hold';}
+  else if(inOL){act='WINDOW OPEN';rsn='London+NY overlap active. Watch your price. If 2 red days = buy. If +15/g from buy = sell. Call dealer.';cls='hold';}
+  else{act='WATCH';rsn='Current: '+sess.lbl+' session. Best action window is 5–9PM UAE. Check back then. Note: best days are Wed & Thu.';cls='watch';}
+  el.className='sighero '+cls+' mb12';
+  aa.textContent=act;
+  aa.style.color=cls==='buy'?'var(--gn)':cls==='sell'?'var(--g3)':cls==='exit'?'var(--rd)':'var(--g3)';
+  rr.textContent=rsn;
+  tt.textContent=pad(h)+':'+pad(m)+' UAE · '+dnames[day]+' · '+sess.lbl+' Session';
+}
+
+// ════════════════════════════════════════════
+// TODAY SUMMARY
+// ════════════════════════════════════════════
+function updateTodaySummary(){
+  const today=fDate(uae());
+  const td=calD[today]||{};
+  const el9=document.getElementById('t9am');
+  const el5=document.getElementById('t5pm');
+  if(el9)el9.textContent=td.am?td.am.toFixed(2):'—';
+  if(el5)el5.textContent=td.pm?td.pm.toFixed(2):'—';
+  const dc=document.getElementById('tdchg');
+  if(dc&&td.am&&td.last){
+    const d=td.last-td.am;
+    dc.textContent=(d>=0?'+':'')+d.toFixed(2);
+    dc.style.color=d>=0?'var(--gn)':'var(--rd)';
+  }
+  // Count red days streak
+  let reds=0;
+  const now=uae();
+  for(let i=1;i<=5;i++){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const k=fDate(d);const p=calD[k];
+    if(p&&p.am&&p.last&&p.last<p.am)reds++;
+    else break;
+  }
+  const dr=document.getElementById('tdrd');
+  if(dr)dr.textContent=reds+' red day'+(reds!==1?'s':'')+' streak';
+  const ds=document.getElementById('tdsig');
+  if(ds){
+    const now2=uae();
+    const sig=genSignal(td.last||0,0,now2.getHours(),now2.getMinutes(),now2.getDay());
+    ds.textContent=sig;
+    ds.style.color=sig.includes('BUY')?'var(--gn)':sig.includes('SELL')?'var(--g3)':sig.includes('EXIT')?'var(--rd)':'var(--tx)';
+  }
+}
+
+// ════════════════════════════════════════════
+// RENDER FEED
+// ════════════════════════════════════════════
+function renderFeed(){
+  const el=document.getElementById('FEED');
+  if(!el)return;
+  if(!feed.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">No prices logged yet. Enter price above or click AUTO FETCH.</div>';return;}
+  const sorted=[...feed].reverse();
+  el.innerHTML=sorted.map((f,i)=>{
+    const dc=f.diff>0.1?'up':f.diff<-0.1?'dn':'fl';
+    const ds=f.diff>0?'+'+f.diff.toFixed(2):f.diff.toFixed(2);
+    const sig=f.signal||'WATCH';
+    const sc=sig.includes('BUY')?'tbuy':sig.includes('SELL')?'tsell':sig.includes('EXIT')?'texit':sig==='CLOSED'||sig==='NO NEW BUY'?'twait':'twait';
+    const isNew=i===0;
+    return`<div class="pf-row${isNew?' new-row':''}">
+      <div>
+        <div class="pf-time">${f.date}</div>
+        <div class="pf-time">${f.time}</div>
+        ${f.auto?'<div style="font-size:8px;color:var(--tx3);margin-top:1px;">auto</div>':''}
+      </div>
+      <div><span class="sp ${f.sess?.includes('5PM')||f.sess?.includes('Overlap')?'spo':f.sess?.includes('London')?'spl':f.sess?.includes('9AM')?'spa':'spn'}">${f.sess||'—'}</span></div>
+      <div>
+        <div class="pf-price">AED ${f.price?.toFixed(2)}</div>
+        <div class="pf-chg ${dc}">${f.prev?ds+' ('+f.pct+'%)':'First entry'}</div>
+      </div>
+      <div class="pf-why"><b>${f.diff>10?'📈 ':f.diff<-10?'📉 ':''}</b>${f.reason}</div>
+      <div><span class="tag ${sc}" style="font-size:8px;">${sig}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════
+// PATTERN ANALYSIS
+// ════════════════════════════════════════════
+function analysePattern(){
+  const el=document.getElementById('PATBOX');
+  if(!el)return;
+  if(feed.length<3){el.innerHTML='';return;}
+  const recent=feed.slice(-5);
+  const drops=recent.filter(f=>f.diff<-1).length;
+  const rises=recent.filter(f=>f.diff>3).length;
+  const last=recent[recent.length-1];
+  let html='';
+  if(drops>=2){
+    html=`<div class="al al-gn">📉 <b>${drops} consecutive drops detected in last ${recent.length} entries.</b> This is a BUY signal pattern. Execute at 5–9PM UAE overlap window. Per 10 AED/g rise: profit = AED ${(10*cfg.bars*116).toLocaleString()} on ${cfg.bars} bars.</div>`;
+  } else if(rises>=2){
+    html=`<div class="al al-g">📈 <b>Rising pattern — ${rises} consecutive rises.</b> If you are holding gold and have +15 AED/g from buy price — consider selling during 5–9PM window today.</div>`;
+  } else if(last&&last.diff<-15){
+    html=`<div class="al al-rd">🚨 <b>Sharp drop of ${last.diff.toFixed(1)} AED/g in last entry!</b> If you are holding from a higher price — check stop-loss (−20/g). Exit rule: call dealer immediately if drop exceeds 20 AED/g from your buy price.</div>`;
+  } else {
+    html=`<div class="al al-g">📊 <b>Mixed pattern.</b> ${drops} drop(s), ${rises} rise(s) in last 5 entries. Wait for 2 consecutive drops to confirm a buy signal. Best window: 5–9PM UAE.</div>`;
+  }
+  el.innerHTML=html;
+}
+
+// ════════════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════════════
+function renderCal(){
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('CALTIT').textContent=months[calM]+' '+calY;
+  const grid=document.getElementById('CALGRID');
+  if(!grid)return;
+  const first=new Date(calY,calM,1).getDay();
+  const daysInM=new Date(calY,calM+1,0).getDate();
+  const prevDays=new Date(calY,calM,0).getDate();
+  const today=uae();
+  let cells='';
+  const total=Math.ceil((first+daysInM)/7)*7;
+  for(let i=0;i<total;i++){
+    let day,other=false;
+    if(i<first){day=prevDays-(first-1-i);other=true;}
+    else if(i>=first+daysInM){day=i-first-daysInM+1;other=true;}
+    else day=i-first+1;
+    const wknd=i%7===0||i%7===6;
+    const key=other?null:`${calY}-${pad(calM+1)}-${pad(day)}`;
+    const isToday=!other&&day===today.getDate()&&calM===today.getMonth()&&calY===today.getFullYear();
+    const d=key&&calD[key];
+    const pft=d&&d.last&&d.am&&d.last>d.am;
+    const lss=d&&d.last&&d.am&&d.last<d.am;
+    cells+=`<div class="calcel${other?' other':''}${wknd?' wknd':''}${isToday?' today':''}${d?' has':''}${pft?' pft':lss?' lss':''}"
+      onclick="${key?`openDay('${key}',${day})`:''}">
+      <div class="cal-n">${day}</div>
+      ${d&&d.am?`<div class="cal-p">9A:${d.am.toFixed(1)}</div>`:''}
+      ${d&&d.pm?`<div class="cal-p">5P:${d.pm.toFixed(1)}</div>`:''}
+      ${d&&d.last?`<div class="cal-p">C:${d.last.toFixed(1)}</div>`:''}
+      ${d&&d.action&&d.action!=='WATCH'?`<div class="cal-a"><span class="tag ${d.action==='BUY'?'tbuy':d.action==='SELL'?'tsell':'thold'}" style="font-size:7px;padding:1px 5px;">${d.action}</span></div>`:''}
+      ${d&&d.profit?`<div class="cal-pf" style="color:${d.profit>0?'var(--gn)':'var(--rd)'}">${d.profit>0?'+':''}${Math.round(d.profit).toLocaleString()}</div>`:''}
+    </div>`;
+  }
+  grid.innerHTML=cells;
+  // Monthly summary
+  const keys=Object.keys(calD).filter(k=>k.startsWith(`${calY}-${pad(calM+1)}`));
+  const mPft=keys.reduce((s,k)=>s+(calD[k].profit||0),0);
+  const mTrades=keys.filter(k=>calD[k].action&&calD[k].action!=='WATCH').length;
+  const calsum=document.getElementById('CALSUM');
+  if(calsum)calsum.innerHTML=`
+    <div class="stat"><div class="sl">Month Profit</div><div class="sv ${mPft>=0?'gn':'rd'}">${mPft>=0?'+':''}AED ${Math.abs(Math.round(mPft)).toLocaleString()}</div><div class="sn">${mTrades} active days</div></div>
+    <div class="stat"><div class="sl">vs Target</div><div class="sv ${mPft>=20000?'gn':mPft>0?'g':'rd'}">${Math.round(mPft/20000*100)}%</div><div class="sn">Target AED 20,000</div></div>`;
+}
+function calPrev(){if(calM===0){calM=11;calY--;}else calM--;renderCal();}
+function calNext(){if(calM===11){calM=0;calY++;}else calM++;renderCal();}
+function openDay(key,day){
+  activeDayKey=key;
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('MODTIT').textContent=months[calM]+' '+day+', '+calY;
+  const d=calD[key]||{};
+  document.getElementById('m-9').value=d.am||'';
+  document.getElementById('m-5').value=d.pm||'';
+  document.getElementById('m-c').value=d.last||'';
+  document.getElementById('m-a').value=d.action||'WATCH';
+  document.getElementById('m-pf').value=d.profit||'';
+  document.getElementById('m-nt').value=d.notes||'';
+  document.getElementById('DAYMOD').classList.remove('off');
+}
+function closeModal(){document.getElementById('DAYMOD').classList.add('off');activeDayKey=null;}
+function saveDay(){
+  if(!activeDayKey)return;
+  const d=calD[activeDayKey]||{};
+  d.am=parseFloat(document.getElementById('m-9').value)||d.am;
+  d.pm=parseFloat(document.getElementById('m-5').value)||d.pm;
+  d.last=parseFloat(document.getElementById('m-c').value)||d.last;
+  d.action=document.getElementById('m-a').value;
+  d.profit=parseFloat(document.getElementById('m-pf').value)||d.profit;
+  d.notes=document.getElementById('m-nt').value;
+  calD[activeDayKey]=d;
+  // Also add to feed
+  if(d.last){
+    const prev=feed.length>0?feed[feed.length-1].price:null;
+    const diff=prev?Math.round((d.last-prev)*100)/100:0;
+    const entry={id:Date.now(),date:activeDayKey,time:'Manual',sess:d.lastSess||'Manual entry',price:d.last,prev,diff,pct:0,reason:d.notes||'Manually entered for '+activeDayKey,signal:d.action,auto:false};
+    feed.push(entry);
+    S.s('feed',feed);
+    updateTopbarPrice(d.last,diff);
+  }
+  S.s('cal',calD);
+  closeModal();
+  renderCal();
+  renderFeed();
+}
+function delDay(){
+  if(!activeDayKey)return;
+  delete calD[activeDayKey];
+  S.s('cal',calD);
+  closeModal();
+  renderCal();
+}
+
+// ════════════════════════════════════════════
+// HISTORY VIEW
+// ════════════════════════════════════════════
+function renderHistory(){
+  // Populate month filter
+  const mf=document.getElementById('hf-m');
+  if(mf&&mf.options.length<3){
+    const months=new Set(feed.map(f=>f.date.slice(0,7)));
+    months.forEach(m=>{ const o=document.createElement('option');o.value=m;o.textContent=m;mf.appendChild(o); });
+  }
+  const mVal=document.getElementById('hf-m')?.value||'';
+  const sVal=document.getElementById('hf-s')?.value||'';
+  const filtered=feed.filter(f=>{
+    if(mVal&&!f.date.startsWith(mVal))return false;
+    if(sVal&&f.sess!==sVal)return false;
+    return true;
+  }).reverse();
+  const el=document.getElementById('HISTTBL');
+  if(!el)return;
+  if(!filtered.length){el.innerHTML='<div class="al al-g">No entries match the filter. Add prices in the Live Feed tab.</div>';return;}
+  el.innerHTML=`<div class="dhist">
+    <div class="dh-row dh-head"><div>Date</div><div>Time</div><div>Session</div><div>Price (AED/g)</div><div>Change</div><div>Reason</div></div>
+    ${filtered.map(f=>{
+      const dc=f.diff>0.1?'var(--gn)':f.diff<-0.1?'var(--rd)':'var(--tx3)';
+      const ds=f.diff>0?'+'+f.diff.toFixed(2):f.diff.toFixed(2);
+      return`<div class="dh-row">
+        <div style="font-size:11px;font-weight:600;">${f.date}</div>
+        <div style="font-size:11px;color:var(--tx3);">${f.time}</div>
+        <div><span class="sp ${f.sess?.includes('5PM')||f.sess?.includes('Overlap')?'spo':f.sess?.includes('London')?'spl':f.sess?.includes('9AM')?'spa':'spn'}" style="font-size:8px;">${f.sess||'—'}</span></div>
+        <div style="font-size:13px;font-weight:700;color:var(--g3);">AED ${f.price?.toFixed(2)}</div>
+        <div style="font-size:11px;font-weight:600;color:${dc};">${f.prev?ds:'—'}</div>
+        <div style="font-size:10px;color:var(--tx3);white-space:normal;line-height:1.5;">${f.reason||'—'}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ════════════════════════════════════════════
+// LIVE SIGNAL CHECK
+// ════════════════════════════════════════════
+function liveCheck(){
+  const cur=parseFloat(document.getElementById('sc-c').value)||0;
+  const buy=parseFloat(document.getElementById('sc-b').value)||0;
+  const days=parseInt(document.getElementById('sc-d').value)||0;
+  const el=document.getElementById('SCRES');
+  if(!cur||!buy){el.innerHTML='';return;}
+  const diff=cur-buy;
+  const profit=diff*cfg.bars*116;
+  let cls,html;
+  if(diff>=30){cls='al-gn';html=`✅ <b>STRONG SELL — Take profit now!</b> Up +${diff.toFixed(1)}/g. Profit: <b>AED ${Math.round(profit).toLocaleString()}</b>. Call dealer between 5–9PM UAE.`;}
+  else if(diff>=15){cls='al-gn';html=`🟡 <b>SELL SIGNAL</b> — Up +${diff.toFixed(1)}/g. Profit: AED ${Math.round(profit).toLocaleString()}. Good target. Sell at 5–9PM overlap.`;}
+  else if(diff>=0){cls='al-g';html=`⏳ <b>HOLD</b> — Only +${diff.toFixed(1)}/g. Need minimum +15/g to sell. Check back at 5PM UAE.`;}
+  else if(diff>-20){cls='al-g';html=`⚠️ <b>WATCH</b> — Down ${Math.abs(diff).toFixed(1)}/g. Within tolerance (limit is −20). Hold and monitor. Don't panic sell.`;}
+  else{cls='al-rd';html=`🚨 <b>EXIT NOW!</b> Down ${Math.abs(diff).toFixed(1)}/g — EXCEEDS −20 stop-loss! Loss: AED ${Math.abs(Math.round(profit)).toLocaleString()}. <b>CALL DEALER IMMEDIATELY.</b>`;}
+  el.innerHTML=`<div class="al ${cls} mt8">${html}</div><div style="font-size:9px;color:var(--tx3);margin-top:4px;">${cfg.bars} bars · ${cfg.bars*116}g · Holding ${days} day${days!==1?'s':''}</div>`;
+}
+
+// ════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════
+function renderDash(){
+  document.getElementById('db-m').textContent='AED '+n2(cfg.myc);
+  document.getElementById('db-i').textContent='AED '+n2(cfg.invc);
+  const tot=trades.reduce((s,t)=>s+(t.profit||0),0);
+  const wins=trades.filter(t=>t.profit>0).length;
+  document.getElementById('db-tp').textContent=(tot>=0?'+':'')+'AED '+n2(Math.abs(tot));
+  document.getElementById('db-tp').className='sv '+(tot>=0?'gn':'rd');
+  document.getElementById('db-tc').textContent=trades.length+' trades';
+  if(trades.length){
+    const wr=Math.round(wins/trades.length*100);
+    document.getElementById('db-wr').textContent=wr+'%';
+    document.getElementById('db-wp').style.width=wr+'%';
+  }
+  const now=uae();
+  const mtr=trades.filter(t=>{const d=new Date(t.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+  const mp=mtr.reduce((s,t)=>s+(t.profit||0),0);
+  const pct=Math.min(100,Math.round(mp/20000*100));
+  document.getElementById('db-mp').style.width=pct+'%';
+  document.getElementById('db-me').textContent=(mp>=0?'+':'')+'AED '+n2(Math.abs(mp))+' this month';
+  document.getElementById('db-mpct').textContent=pct+'%';
+  const tb=document.getElementById('db-rt');
+  if(!trades.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:16px;">No trades yet</td></tr>';return;}
+  tb.innerHTML=[...trades].reverse().slice(0,6).map(t=>`<tr>
+    <td style="font-size:10px">${t.date||'—'}</td>
+    <td style="font-size:10px;color:var(--tx3)">${t.time||'—'}</td>
+    <td><span class="tag ${t.action==='BUY'?'tbuy':t.action==='SELL'?'tsell':'thold'}">${t.action}</span></td>
+    <td style="color:var(--g3);font-weight:700">${t.price?'AED '+t.price:t.buy?'AED '+t.buy:'—'}</td>
+    <td style="color:${t.profit>0?'var(--gn)':t.profit<0?'var(--rd)':'var(--tx3)'};font-weight:700">${t.profit!=null?(t.profit>0?'+':'')+' AED '+n2(Math.abs(t.profit)):'—'}</td>
+    <td style="font-size:9px;color:var(--tx3);max-width:120px;overflow:hidden;text-overflow:ellipsis">${t.reason||t.notes||'—'}</td>
+  </tr>`).join('');
+}
+
+// ════════════════════════════════════════════
+// PLAN DATA
+// ════════════════════════════════════════════
+const PLAN=[
+  {k:'apr',n:'April 2026',tag:'RECOVERY',c:'var(--or)',r:'560–620',note:'Post-crash. Fed Apr 29.',tgt:'13K–24K',
+   wks:[{w:'Wk1',d:'Apr 14–18',a:'BUY',ac:'var(--gn)',t:'560–572',r:'Buy dip below 570.',p:'—'},
+        {w:'Wk2',d:'Apr 19–25',a:'SELL',ac:'var(--g3)',t:'590–605',r:'Sell at 590+.',p:'+AED 6,264–11,484'},
+        {w:'Wk2-3',d:'Apr 22–28',a:'BUY',ac:'var(--gn)',t:'575–585',r:'Re-enter on pullback.',p:'—'},
+        {w:'Wk4',d:'Apr 28–30',a:'SELL',ac:'var(--g3)',t:'605–620',r:'Sell before/on Fed Apr 29.',p:'+AED 6,960–12,180'},
+        {w:'RISK',d:'—',a:'EXIT',ac:'var(--rd)',t:'< 545',r:'Below 545 = exit immediately.',p:'Safe'}]},
+  {k:'may',n:'May 2026',tag:'BULLISH',c:'var(--gn)',r:'600–660',note:'Strong trend. 2–3 cycles.',tgt:'17K–28K',
+   wks:[{w:'Wk1',d:'May 1–9',a:'BUY',ac:'var(--gn)',t:'600–615',r:'Buy early week dip.',p:'—'},
+        {w:'Wk2',d:'May 10–16',a:'SELL',ac:'var(--g3)',t:'630–645',r:'Sell +20/g from buy.',p:'+AED 6,960–10,440'},
+        {w:'Wk2-3',d:'May 14–20',a:'BUY',ac:'var(--gn)',t:'618–630',r:'Re-enter after pullback.',p:'—'},
+        {w:'Wk3-4',d:'May 20–30',a:'SELL',ac:'var(--g3)',t:'645–665',r:'Strong close. Sell 650+.',p:'+AED 10,440–17,400'}]},
+  {k:'jun',n:'June 2026',tag:'SIDEWAYS',c:'var(--or)',r:'630–690',note:'Summer slow. 1–2 trades.',tgt:'10K–15K',
+   wks:[{w:'Wk1',d:'Jun 1–6',a:'WAIT',ac:'var(--tx3)',t:'Watch 630',r:'Wait for clear signal.',p:'—'},
+        {w:'Wk1-2',d:'Jun 5–12',a:'BUY',ac:'var(--gn)',t:'635–648',r:'Buy after 2 red days only.',p:'—'},
+        {w:'Wk3',d:'Jun 16–20',a:'SELL',ac:'var(--g3)',t:'658–672',r:'Min +15/g. Take profit.',p:'+AED 5,220–8,352'},
+        {w:'Wk4',d:'Jun 29–30',a:'SELL',ac:'var(--g3)',t:'665–680',r:'Month-end close.',p:'+AED 5,220–6,960'}]},
+  {k:'jul',n:'July 2026',tag:'BULLISH',c:'var(--gn)',r:'660–730',note:'Q3 start. Fed Jul 29.',tgt:'19K–28K',
+   wks:[{w:'Wk1',d:'Jul 1–5',a:'BUY',ac:'var(--gn)',t:'660–675',r:'New quarter. Buy first 2 days.',p:'—'},
+        {w:'Wk2',d:'Jul 8–14',a:'SELL',ac:'var(--g3)',t:'690–705',r:'Sell +25/g.',p:'+AED 8,700–10,440'},
+        {w:'Wk2-3',d:'Jul 14–18',a:'BUY',ac:'var(--gn)',t:'678–690',r:'Mid-month dip. Re-enter.',p:'—'},
+        {w:'Wk3-4',d:'Jul 21–31',a:'SELL',ac:'var(--g3)',t:'710–730',r:'Month-end push. Sell 710+.',p:'+AED 10,440–17,400'}]},
+  {k:'aug',n:'August 2026',tag:'BEST MONTH',c:'var(--gn)',r:'700–775',note:"Gold's best. Jackson Hole.",tgt:'29K–45K',
+   wks:[{w:'Wk1',d:'Aug 1–7',a:'BUY',ac:'var(--gn)',t:'700–715',r:'Buy Aug 3 — no hesitation.',p:'—'},
+        {w:'Wk2',d:'Aug 10–15',a:'SELL',ac:'var(--g3)',t:'730–748',r:'Take +25 min.',p:'+AED 8,700–12,180'},
+        {w:'Wk2',d:'Aug 13–15',a:'BUY',ac:'var(--gn)',t:'718–730',r:'Re-enter fast.',p:'—'},
+        {w:'Wk3 🔥',d:'Aug 18–22',a:'SELL',ac:'var(--g3)',t:'748–762',r:'JACKSON HOLE — sell on speech day.',p:'+AED 10,440–14,888'},
+        {w:'Wk3-4',d:'Aug 22–29',a:'BUY',ac:'var(--gn)',t:'738–752',r:'Post-Fed dip = buy.',p:'—'},
+        {w:'Wk4',d:'Aug 29–31',a:'SELL',ac:'var(--g3)',t:'762–778',r:'Month-end close strong.',p:'+AED 10,440–18,096'}]},
+  {k:'sep',n:'September 2026',tag:'FED SPIKE',c:'var(--bl)',r:'750–820',note:'Rate cut Sep 17. BIGGEST trade.',tgt:'22K–32K',
+   wks:[{w:'Wk1',d:'Sep 1–5',a:'BUY',ac:'var(--gn)',t:'750–765',r:'September opens strong.',p:'—'},
+        {w:'Wk2',d:'Sep 8–12',a:'SELL',ac:'var(--g3)',t:'778–792',r:'First profit +25/g.',p:'+AED 8,700–10,440'},
+        {w:'Wk2-3',d:'Sep 12–16',a:'BUY',ac:'var(--gn)',t:'768–780',r:'Buy BEFORE Fed Sep 17.',p:'—'},
+        {w:'Wk3 🔥🔥',d:'Sep 17–19',a:'SELL',ac:'var(--g3)',t:'800–820',r:'FED RATE CUT. Sell on day. Gold +30-50/g.',p:'+AED 13,920–20,880'},
+        {w:'Wk4',d:'Sep 22–30',a:'HOLD',ac:'var(--bl)',t:'790–815',r:'After cut — may keep rising.',p:'Carry fwd'}]},
+];
+function renderPlan(){
+  const strip=document.getElementById('PSTRIP');
+  if(strip)strip.innerHTML=PLAN.map(p=>`<div class="stat" style="border-left:2px solid ${p.c}"><div class="sl">${p.n.split(' ')[0]}</div><div style="font-size:14px;font-weight:700;color:${p.c};">${p.tgt}</div><div style="font-size:9px;color:var(--tx3);margin-top:2px;">${p.tag}</div></div>`).join('');
+  const tabs=document.getElementById('PTABS');
+  if(tabs&&!tabs.children.length)tabs.innerHTML=PLAN.map((p,i)=>`<button class="ptab${i===0?' on':''}" onclick="showPM('${p.k}',this)">${p.n.split(' ')[0]}</button>`).join('');
+  showPM(PLAN[0].k);
+}
+function showPM(key,btn){
+  document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  const p=PLAN.find(x=>x.k===key);
+  const el=document.getElementById('PCONT');
+  if(!p||!el)return;
+  el.innerHTML=`<div class="fx fxc gap8 mb8"><div style="font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:#fff;">${p.n}</div><span class="tag" style="background:${p.c}22;color:${p.c};border:1px solid ${p.c}55;">${p.tag}</span><span style="font-size:10px;color:var(--g3);">${p.r}</span></div>
+  <div style="font-size:11px;color:var(--tx3);margin-bottom:11px;">${p.note}</div>
+  <div class="tw mb10"><table class="tbl"><thead><tr><th>Week</th><th>Dates</th><th>Action</th><th>Target</th><th>Reason</th><th>Profit</th></tr></thead><tbody>
+  ${p.wks.map(w=>`<tr><td style="color:var(--tx3);font-size:9px">${w.w}</td><td style="font-size:9px;color:var(--tx3)">${w.d}</td>
+  <td><span class="tag" style="background:${w.ac}22;color:${w.ac};border:1px solid ${w.ac}55;font-size:8px">${w.a}</span></td>
+  <td style="color:var(--g3);font-weight:700;font-size:10px">${w.t}</td>
+  <td style="font-size:10px">${w.r}</td>
+  <td style="font-size:10px;font-weight:700;color:${w.p.startsWith('+')?'var(--gn)':w.p.startsWith('-')?'var(--rd)':'var(--tx3)'}">${w.p}</td></tr>`).join('')}
+  </tbody></table></div>
+  <div class="g3"><div class="stat"><div class="sl">Target Gross</div><div class="sv gn" style="font-size:15px">AED ${p.tgt}</div></div>
+  <div class="stat"><div class="sl">Your Share (${cfg.split}%)</div><div class="sv g" style="font-size:15px">${cShr(p.tgt,cfg.split)}</div></div>
+  <div class="stat"><div class="sl">Investor Share</div><div class="sv g" style="font-size:15px">${cShr(p.tgt,100-cfg.split)}</div></div></div>`;
+}
+function cShr(r,pct){const p=r.replace(/K/g,'000').split('–');if(p.length<2)return'—';return'AED '+n2(Math.round(parseInt(p[0])*pct/100))+'–'+n2(Math.round(parseInt(p[1])*pct/100));}
+
+// ════════════════════════════════════════════
+// INVESTOR
+// ════════════════════════════════════════════
+const pitches=[
+`Assalamu Alaikum,
+
+I wanted to share an investment opportunity I believe is worth your attention.
+
+I am running a physical gold trading operation in Dubai. I buy 24K gold TT bars (116g each) through my dealer connections, trade the monthly price swings, and generate consistent returns.
+
+Structure:
+• I invest AED 1,00,000 of my own money
+• I need one partner to invest AED 1,00,000
+• All profits split 50/50 monthly
+• Capital always protected as physical gold
+
+Returns (your 50% share):
+→ Strong months: AED 10,000–22,000
+→ Average months: AED 6,000–10,000  
+→ Worst case: Capital safe in physical gold
+
+Annual ROI: 27–43% on AED 1,00,000.
+Compare: Bank deposits = 2–3% annually.
+
+I have a full 6-month trade plan with real data.
+Let me know if you want to discuss.`,
+`Bhai/Boss,
+
+Simple investment — I need one partner.
+
+✅ You put in AED 1,00,000
+✅ I put my own AED 1,00,000 too
+✅ I trade physical 24K gold bars  
+✅ Profits 50/50 every month
+
+Good months: AED 10K–22K your share
+Normal months: AED 6K–10K
+Bad months: Money stays in gold. Never lost.
+
+Gold never goes to zero.
+I have my own money in this too — same risk.
+Jan 2026 alone: +155 AED/g swing.
+
+Full plan and data ready.
+15 minutes is enough. Let's meet.`];
+function renderInv(){
+  document.getElementById('iv-m').textContent='AED '+n2(cfg.myc);
+  document.getElementById('iv-i').textContent='AED '+n2(cfg.invc);
+  renderPayTable();renderPitch();
+}
+function renderPayTable(){
+  const el=document.getElementById('PAYT');if(!el)return;
+  if(!pays.length){el.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--tx3);padding:14px;font-size:11px;">None yet</td></tr>';return;}
+  el.innerHTML=pays.map(p=>`<tr>
+    <td style="font-size:11px">${p.month}</td>
+    <td style="color:var(--gn)">${p.gross?'AED '+n2(p.gross):'—'}</td>
+    <td style="color:var(--g3);font-weight:700">${p.share?'AED '+n2(p.share):'—'}</td>
+    <td>${p.paid?'<span class="tag tbuy">PAID ✓</span>':'<span class="tag twait">PENDING</span>'}</td>
+    <td><button class="btn bgn bsm" onclick="tPay(${p.id})">${p.paid?'Unmark':'✓ Paid'}</button> <button class="btn brd bsm" onclick="dPay(${p.id})">✕</button></td>
+  </tr>`).join('');
+}
+function addPay(){const m=prompt('Month:');if(!m)return;const g=parseFloat(prompt('Gross profit AED:')||0);pays.push({id:Date.now(),month:m,gross:g,share:Math.round(g*((100-cfg.split)/100)),paid:false});S.s('pays',pays);renderPayTable();}
+function tPay(id){const p=pays.find(x=>x.id===id);if(p){p.paid=!p.paid;S.s('pays',pays);renderPayTable();}}
+function dPay(id){if(confirm('Delete?')){pays=pays.filter(x=>x.id!==id);S.s('pays',pays);renderPayTable();}}
+function renderPitch(){const el=document.getElementById('PITCH');if(el)el.textContent=pitches[pStyle];}
+function swPitch(){pStyle=pStyle?0:1;renderPitch();}
+function copyPitch(){navigator.clipboard.writeText(pitches[pStyle]).then(()=>alert('Copied!'));}
+
+// ════════════════════════════════════════════
+// RULES
+// ════════════════════════════════════════════
+function loadRules(){
+  const n=S.g('notes')||'';const e=document.getElementById('NTS');if(e)e.value=n;
+  const c=S.g('cont')||{};
+  ['c1','c2','c3','c4'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value=c[id]||'';});
+}
+function saveNotes(){S.s('notes',document.getElementById('NTS').value);flash('nok');}
+function saveCont(){const c={};['c1','c2','c3','c4'].forEach(id=>{c[id]=document.getElementById(id)?.value||'';});S.s('cont',c);flash('cok');}
+function flash(id){const e=document.getElementById(id);if(!e)return;e.textContent='Saved ✓';setTimeout(()=>e.textContent='',2000);}
+
+// ════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════
+function loadSet(){
+  document.getElementById('s-m').value=cfg.myc;
+  document.getElementById('s-i').value=cfg.invc;
+  document.getElementById('s-sp').value=cfg.split;
+  document.getElementById('s-b').value=cfg.bars;
+}
+function saveSet(){
+  cfg.myc=parseInt(document.getElementById('s-m').value)||100000;
+  cfg.invc=parseInt(document.getElementById('s-i').value)||100000;
+  cfg.split=parseInt(document.getElementById('s-sp').value)||50;
+  cfg.bars=parseInt(document.getElementById('s-b').value)||3;
+  S.s('cfg',cfg);flash('sok');renderDash();
+}
+function changePW(){
+  const c=document.getElementById('p1').value,n=document.getElementById('p2').value,cf=document.getElementById('p3').value;
+  const el=document.getElementById('pm');
+  if(c!==cfg.pw){el.style.color='var(--rd)';el.textContent='Wrong password.';return;}
+  if(n!==cf){el.style.color='var(--rd)';el.textContent='No match.';return;}
+  if(n.length<4){el.style.color='var(--rd)';el.textContent='Min 4 chars.';return;}
+  cfg.pw=n;S.s('cfg',cfg);el.style.color='var(--gn)';el.textContent='Changed!';
+  ['p1','p2','p3'].forEach(id=>document.getElementById(id).value='');
+  setTimeout(()=>el.textContent='',3000);
+}
+function nukeAll(){if(confirm('Delete ALL data?')){localStorage.clear();location.reload();}}
+function exportD(){
+  const d={cfg,feed,trades,calD,pays,notes:S.g('notes'),cont:S.g('cont'),ts:new Date().toISOString()};
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));
+  a.download='gms-backup-'+fDate(uae())+'.json';a.click();
+}
+function importD(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.cfg)S.s('cfg',d.cfg);if(d.feed)S.s('feed',d.feed);
+      if(d.trades)S.s('trades',d.trades);if(d.calD)S.s('cal',d.calD);
+      if(d.pays)S.s('pays',d.pays);if(d.notes)S.s('notes',d.notes);
+      if(d.cont)S.s('cont',d.cont);
+      alert('Imported! Reloading...');location.reload();
+    }catch{alert('Invalid file.');}
+  };r.readAsText(f);
+}
+
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function n2(n){return Math.abs(Math.round(n)).toLocaleString();}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+function initApp(){
+  tick();
+  setInterval(tick,15000);
+  renderDash();
+  renderPlan();
+  renderInv();
+  renderPitch();
+  loadRules();
+  loadSet();
+  renderFeed();
+  renderCal();
+  analysePattern();
+  updateTodaySummary();
+  // Restore last price to topbar
+  if(feed.length>0){
+    const last=feed[feed.length-1];
+    updateTopbarPrice(last.price,last.diff||0);
+  }
+}
+</script>
+</body>
+</html>
